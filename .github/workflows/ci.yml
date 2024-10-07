@@ -33,7 +33,7 @@ jobs:
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
           fantomas ./lab1/src/*.fs 
       - name: Run project
-        run: dotnet run --project ./src
+        run: dotnet run --project ./lab1/src
       - name: Tests
         run: |
             dotnet restore lab1/test/test.fsproj
