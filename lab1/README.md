@@ -20,11 +20,12 @@
 ### Задача №8
 
 #### Проблема 
+
 Найти максимально произведение последовательности из 13-подряд идущих цифр в числе из 1000 цифр. 
 
 #### Решение 
 
-1. Генерация последовательности при помощи отображения (map). Используем для преобразование числа из типа string в list<int>
+1. Генерация последовательности при помощи отображения (map). Используем для преобразование числа из типа string в list
 
 ```
 let stringToIntList str =
@@ -78,3 +79,96 @@ let findMaxProductModule str =
     |> List.map productOfDigits
     |> List.max
 ```
+
+5. Реализация на Python:
+
+```
+
+```
+
+--- 
+### Задача №21
+
+#### Проблема 
+
+`d(n)` - сумма всех делителей числа n 
+Необходимо найти сумму всех чисел, меньших 10000, для которых выполняются условия: 
+- `d(a) = b` и `d(b) = a`
+- `a != b`
+
+#### Решение
+
+1. Хвостовая рекурсия использована для реализации функции `d(n)` - нахождения суммы всех делителей
+
+```
+let d1 n =
+    let rec aux acc i =
+        if i >= n then acc
+        else if n % i = 0 then aux (acc + i) (i + 1)
+        else aux acc (i + 1)
+    aux 0 1
+```
+
+2. Рекурсия для нахождения всех "дружественных" пар чисел 
+
+```
+let rec findAmicableNumbers n limit acc =
+    if n >= limit then acc
+    else
+        let b = d1 n
+        if b < limit && b <> n && d1 b = n then
+            findAmicableNumbers (n + 1) limit (n :: acc)
+        else
+            findAmicableNumbers (n + 1) limit acc
+```
+
+3. Генерация пар числа и значения функции при помощи map. Выбирается только одно число из каждой пары, так как для двух чисел необходимо выбрать только само число, а не результат его функции:  
+
+```
+let amicablePairs limit =
+    [1 .. limit-1]
+    |> List.map (fun a -> (a, d2 a))
+    |> List.filter (fun (a, b) -> b < limit && b <> a && d2 b = a)
+
+let amicableNumbers = amicablePairs 10000 |> List.map fst
+let amicableSumMap = List.sum amicableNumbers
+```
+
+4. Использование специального синтаксиса для цикла for: 
+
+```
+let findAmicableNumbersLoop limit =
+    let amicableNumbers = ref []
+    for n in 1 .. limit - 1 do
+        let b = d2 n
+        if b < limit && b <> n && d2 b = n then
+            amicableNumbers := n :: !amicableNumbers
+    List.sum !amicableNumbers
+```
+
+5. Ленивые коллекции: 
+
+```
+let amicableNumbersUnder limit =
+    seq {
+        for n in 1 .. limit - 1 do
+            let b = d1 n
+            if b < limit && b <> n && d1 b = n then
+                yield n
+    }
+
+let amicableSumLazy = 
+    amicableNumbersUnder 10000 
+    |> Seq.sum
+```
+
+6. Реализация на Python:
+
+```
+
+```
+
+---
+### Выводы
+
+В ходе данной лабораторной работы 
