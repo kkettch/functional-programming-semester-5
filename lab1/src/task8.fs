@@ -2,49 +2,51 @@ module MaxProduct
 
 open System.Numerics
 
-let stringToIntList str =
-    str 
-    |> Seq.map (fun ch -> bigint (int (string ch)))
+let stringToIntList str = 
+    str
+    |> Seq.map (fun digit -> bigint (int (string digit)))
     |> Seq.toList
 
-let rec findUsingTailRecursion numbersList maxProd i =
-    if i > (List.length numbersList - 13) then maxProd
-    else 
-        let currentDigits = 
-            List.skip i numbersList 
+let rec findMaxTailRecursion nbrList maxProd i = 
+    if i > (List.length nbrList - 13) then maxProd
+    else
+        let curNbr = 
+            List.skip i nbrList
             |> List.take 13
-        let product = List.fold (*) 1I currentDigits
-        let newMaxProd = if product > maxProd then product else maxProd
-        findUsingTailRecursion numbersList newMaxProd (i + 1)
+        let prod: BigInteger = List.fold (*) 1I curNbr
+        let newMaxProd = 
+            if prod > maxProd then prod else maxProd
+        findMaxTailRecursion nbrList newMaxProd (i + 1)
 
-let findMaxProductTailRecursion str =
-    let numbersList = stringToIntList str
-    findUsingTailRecursion numbersList 0I 0 
+let rec maxProdTailRecursion str =
+    let nbrList = stringToIntList str
+    findMaxTailRecursion nbrList 0I 0
 
-let rec findUsingRecursion numbersList =
-    match numbersList with
+let rec findMaxRecursion nbrList = 
+    match nbrList with
     | [] -> 0I
-    | _ when List.length numbersList < 13 -> 0I
-    | _ ->
-        let product = 
-            List.take 13 numbersList 
-            |> List.fold (*) 1I
-        max product (findUsingRecursion (List.tail numbersList))
+    | _ when List.length nbrList < 13 -> 0I
+    | _ -> 
+        let prod = 
+            List.take 13 nbrList 
+            |> List.fold (*) 1I 
+        max prod (findMaxRecursion (List.tail nbrList))
 
-let findMaxProductRecursion str =
-    let numbersList = stringToIntList str
-    findUsingRecursion numbersList
+let rec maxProdRecursion str =
+    let nbrList = stringToIntList str
+    findMaxRecursion nbrList
 
-let getSubsequences numbersList = 
-    numbersList 
-    |> List.windowed 13 
+let getSubSeq nbrList = 
+    nbrList
+    |> List.windowed 13
 
-let productOfDigits numbersList =
-    List.fold (*) 1I numbersList
+let getProd nbrList =
+    List.fold (*) 1I nbrList
 
-let findMaxProductModule str =
+let maxProdModule str = 
     str
     |> stringToIntList
-    |> getSubsequences
-    |> List.map productOfDigits
+    |> getSubSeq
+    |> List.map getProd
     |> List.max
+
