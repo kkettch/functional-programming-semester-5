@@ -26,7 +26,7 @@
 
 1. Генерация последовательности при помощи отображения (map). Используем для преобразование числа из типа string в list<int>
 
-```
+```F#
 let stringToIntList str =
 	str
 	|> Seq.map (string >> int)
