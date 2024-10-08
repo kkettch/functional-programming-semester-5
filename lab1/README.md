@@ -25,81 +25,77 @@
 
 #### Решение 
 
-1. Генерация последовательности при помощи отображения (map). Используем для преобразование числа из типа string в list
+1. Генерация последовательности при помощи отображения (map)
 
-```
-let stringToIntList str =
-    str 
-    |> Seq.map (fun ch -> bigint (int (string ch)))
-    |> Seq.toList
+```F#
+let stringToIntList str = 
+    str
+    |> Seq.map (fun digit -> bigint (int (string digit)))
+    |> Seq.toList
 ```
 
 2. Хвостовая рекурсия для нахождения максимального произведения
 
-```
-let rec findUsingTailRecursion numbersList maxProd i =
-    if i > (List.length numbersList - 13) then maxProd
-    else 
-        let currentDigits = 
-            List.skip i numbersList 
-            |> List.take 13
-        let product = List.fold (*) 1I currentDigits
-        let newMaxProd = if product > maxProd then product else maxProd
-        findUsingTailRecursion numbersList newMaxProd (i + 1)
-```
-
-3. Способ нахождения максимального произведения при помощи рекурсии 
-
-```
-let rec findUsingRecursion numbersList =
-    match numbersList with
-    | [] -> 0I
-    | _ when List.length numbersList < 13 -> 0I
-    | _ ->
-        let product = 
-            List.take 13 numbersList 
-            |> List.fold (*) 1I
-        max product (findUsingRecursion (List.tail numbersList))
+```F#
+let rec findMaxTailRecursion nbrList maxProd i = 
+    if i > (List.length nbrList - 13) then maxProd
+    else
+        let curNbr = 
+            List.skip i nbrList
+            |> List.take 13
+        let prod: BigInteger = List.fold (*) 1I curNbr
+        let newMaxProd = 
+            if prod > maxProd then prod else maxProd
+        findMaxTailRecursion nbrList newMaxProd (i + 1)
 ```
 
-4. Модульная реализация с разбиением на отдельные функции и использование List.map. Использование отдельных функций для получения всех подпоследовательностей из 13 цифр и нахождения произведения. 
+3.  Рекурсия используя сопоставление с образцом (pattern matching)
 
+```F#
+let rec findMaxRecursion nbrList = 
+    match nbrList with
+    | [] -> 0I
+    | _ when List.length nbrList < 13 -> 0I
+    | _ -> 
+        let prod = 
+            List.take 13 nbrList 
+            |> List.fold (*) 1I 
+        max prod (findMaxRecursion (List.tail nbrList))
 ```
-let getSubsequences numbersList = 
-    numbersList 
-    |> List.windowed 13 
 
-let productOfDigits numbersList =
-    List.fold (*) 1I numbersList
+4. Модульная реализация и использование List.map. Отдельные функции для получения всех подпоследовательностей из 13 цифр и нахождения произведения
 
-let findMaxProductModule str =
-    str
-    |> stringToIntList
-    |> getSubsequences
-    |> List.map productOfDigits
-    |> List.max
+```F#
+let getSubSeq nbrList = 
+    nbrList
+    |> List.windowed 13
+
+let getProd nbrList =
+    List.fold (*) 1I nbrList
+
+let maxProdModule str = 
+    str
+    |> stringToIntList
+    |> getSubSeq
+    |> List.map getProd
+    |> List.max
 ```
 
 5. Реализация на Python:
 
-```
+```Python
 strToInt = [int(digit) for digit in number]
-
 def find_product(strToInt):
     product = 1
     for number in strToInt:
         product *= number
     return product
-
 max_prod = 0
-
 for i in range(len(strToInt) - 13 + 1):
     curent_sequence = strToInt[i:i+13]
     current_prod = find_product(curent_sequence)
     if current_prod > max_prod:
         max_prod = current_prod
-
-print("Максимальное произведение: ", max_prod)
 ```
 
 --- 
@@ -114,73 +110,80 @@ print("Максимальное произведение: ", max_prod)
 
 #### Решение
 
-1. Хвостовая рекурсия использована для реализации функции `d(n)` - нахождения суммы всех делителей
+1. Хвостовая рекурсия для реализации функции `d(n)` - нахождения суммы всех делителей числа `n`
 
-```
-let d1 n =
-    let rec aux acc i =
+```F#
+let d n =
+    let rec findSum acc i =
         if i >= n then acc
-        else if n % i = 0 then aux (acc + i) (i + 1)
-        else aux acc (i + 1)
-    aux 0 1
+        elif n % i = 0 then findSum (acc + i) (i + 1)
+        else findSum acc (i + 1)
+    findSum 0 1
 ```
 
-2. Рекурсия для нахождения всех "дружественных" пар чисел 
+2. Рекурсия для нахождения дружественных чисел < 10000
 
-```
-let rec findAmicableNumbers n limit acc =
+```F#
+let rec getAmicableNumbersRecursion n limit acc =
     if n >= limit then acc
     else
-        let b = d1 n
-        if b < limit && b <> n && d1 b = n then
-            findAmicableNumbers (n + 1) limit (n :: acc)
-        else
-            findAmicableNumbers (n + 1) limit acc
+        let b = d n
+        if b <> n && d b = n && b < limit then
+            getAmicableNumbersRecursion (n + 1) limit (n :: acc)
+        else getAmicableNumbersRecursion (n + 1) limit acc
 ```
 
-3. Генерация пар числа и значения функции при помощи map. Выбирается только одно число из каждой пары, так как для двух чисел необходимо выбрать только само число, а не результат его функции:  
+3. Нахождение дружественных чисел с использованием map:
+- Находятся все дружественные пары (a, d(a), удовлетворяющие условию
+- Считается сумма  всех первых элементов пар
 
-```
-let amicablePairs limit =
+```F#
+let getAmicablePairs limit =
     [1 .. limit-1]
-    |> List.map (fun a -> (a, d2 a))
-    |> List.filter (fun (a, b) -> b < limit && b <> a && d2 b = a)
+    |> List.map (fun a -> (a, d a))
+    |> List.filter (fun (a, b) -> a <> b && d b = a && b < limit)
 
-let amicableNumbers = amicablePairs 10000 |> List.map fst
-let amicableSumMap = List.sum amicableNumbers
+let getAmicableNumbersMap = 
+    getAmicablePairs 10000
+    |> List.map fst
+
+let amicableSumMap = List.sum getAmicableNumbersMap
 ```
 
-4. Использование специального синтаксиса для цикла for: 
+4. Ленивые коллекции и использование специального синтаксиса для циклов
 
-```
-let findAmicableNumbersLoop limit =
-    let amicableNumbers = ref []
-    for n in 1 .. limit - 1 do
-        let b = d2 n
-        if b < limit && b <> n && d2 b = n then
-            amicableNumbers := n :: !amicableNumbers
-    List.sum !amicableNumbers
-```
-
-5. Ленивые коллекции: 
-
-```
-let amicableNumbersUnder limit =
+```F#
+let getAmicableNumbersLazy limit =
     seq {
-        for n in 1 .. limit - 1 do
-            let b = d1 n
-            if b < limit && b <> n && d1 b = n then
+        for n in 1 .. limit-1 do
+            let b = d n
+            if b <> n && d b = n && b < limit then
                 yield n
     }
 
-let amicableSumLazy = 
-    amicableNumbersUnder 10000 
-    |> Seq.sum
+let amicableSumLazy = Seq.sum (getAmicableNumbersLazy 10000)
+```
+
+5. Еще один вариант реализации, используя List.filter
+
+```F#
+let sumDivisors n =
+    [1 .. n/2]
+    |> List.filter (fun x -> n % x = 0)
+    |> List.sum
+
+let getAmicableNumberFilter limit =
+    [1 .. limit - 1]
+    |> List.filter 
+        (fun n -> 
+            let b = sumDivisors n
+            b <> n && sumDivisors b = n && b < limit
+        )
 ```
 
 6. Реализация на Python:
 
-```
+```Python
 def d(n):
     total = 1 
     for i in range(2, int(n**0.5) + 1):
@@ -189,7 +192,6 @@ def d(n):
             if i != n // i:  
                 total += n // i
     return total
-
 def find_amicable_numbers(limit):
     amicable_numbers = []
     for a in range(2, limit):
@@ -197,10 +199,8 @@ def find_amicable_numbers(limit):
         if b != a and d(b) == a:
             amicable_numbers.append(a)
     return amicable_numbers
-
 limit = 10000
 amicable_numbers = find_amicable_numbers(limit)
-print("Полученная сумма для чисел меньших 10000: ", sum(amicable_numbers))
 ```
 
 ---
