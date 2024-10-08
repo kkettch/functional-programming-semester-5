@@ -181,7 +181,26 @@ let amicableSumLazy = 
 6. Реализация на Python:
 
 ```
+def d(n):
+    total = 1 
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            total += i
+            if i != n // i:  
+                total += n // i
+    return total
 
+def find_amicable_numbers(limit):
+    amicable_numbers = []
+    for a in range(2, limit):
+        b = d(a)
+        if b != a and d(b) == a:
+            amicable_numbers.append(a)
+    return amicable_numbers
+
+limit = 10000
+amicable_numbers = find_amicable_numbers(limit)
+print("Полученная сумма для чисел меньших 10000: ", sum(amicable_numbers))
 ```
 
 ---
