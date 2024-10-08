@@ -18,16 +18,16 @@ let main argv =
 
     printfn "Task №21"
 
-    let result3 = amicableSumRecursion
-    printfn "Result after using recursion: %d" result3
+    let result4 = amicableSumRecursion
+    printfn "Result after using recursion: %d" result4
 
-    let result4 = amicableSumMap
-    printfn "Result after using map: %d" result4
+    let result5 = amicableSumMap
+    printfn "Result after using map: %d" result5
     
-    let result4 = amicableSumLazy
-    printfn "Result after using lazy collection: %d" result4
+    let result6 = amicableSumLazy
+    printfn "Result after using lazy collection: %d" result6
     
-    let result5 = amicableSumFilter
-    printfn "Result after using filter: %d" result5
+    let result7 = amicableSumFilter
+    printfn "Result after using filter: %d" result7
     
     0
