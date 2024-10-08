@@ -1,4 +1,5 @@
 open System 
+open System.Numerics
 open MaxProduct
 open AmicableNumbers
 
