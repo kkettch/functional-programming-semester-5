@@ -29,61 +29,77 @@
 
 ```
 let stringToIntList str =
-	str
-	|> Seq.map (string >> int)
-	|> Seq.toList
+    str 
+    |> Seq.map (fun ch -> bigint (int (string ch)))
+    |> Seq.toList
 ```
 
 2. Хвостовая рекурсия для нахождения максимального произведения
 
 ```
 let rec findUsingTailRecursion numbersList maxProd i =
-    if i > (List.length numbersList - 13) then maxProd
-    else 
-        let currentDigits = 
-            List.skip i numbersList 
-            |> List.take 13
-        let product = List.fold (*) 1 currentDigits
-        let newMaxProd = if product > maxProd then product else maxProd
-        findUsingTailRecursion numbersList newMaxProd (i + 1)
+    if i > (List.length numbersList - 13) then maxProd
+    else 
+        let currentDigits = 
+            List.skip i numbersList 
+            |> List.take 13
+        let product = List.fold (*) 1I currentDigits
+        let newMaxProd = if product > maxProd then product else maxProd
+        findUsingTailRecursion numbersList newMaxProd (i + 1)
 ```
 
 3. Способ нахождения максимального произведения при помощи рекурсии 
 
 ```
 let rec findUsingRecursion numbersList =
-    match numbersList with
-    | [] -> 0
-    | _ when List.length numbersList < 13 -> 0
-    | _ ->
-        let product = 
-            List.take 13 numbersList 
-            |> List.fold (*) 1
-        max product (findUsingRecursion (List.tail numbersList))
+    match numbersList with
+    | [] -> 0I
+    | _ when List.length numbersList < 13 -> 0I
+    | _ ->
+        let product = 
+            List.take 13 numbersList 
+            |> List.fold (*) 1I
+        max product (findUsingRecursion (List.tail numbersList))
 ```
 
 4. Модульная реализация с разбиением на отдельные функции и использование List.map. Использование отдельных функций для получения всех подпоследовательностей из 13 цифр и нахождения произведения. 
 
 ```
-let getSubsequences numbersList = 
-    numbersList 
-    |> List.windowed 13 
+let getSubsequences numbersList = 
+    numbersList 
+    |> List.windowed 13 
 
 let productOfDigits numbersList =
-    List.fold (*) 1 numbersList
+    List.fold (*) 1I numbersList
 
 let findMaxProductModule str =
-    str
-    |> stringToIntList
-    |> getSubsequences
-    |> List.map productOfDigits
-    |> List.max
+    str
+    |> stringToIntList
+    |> getSubsequences
+    |> List.map productOfDigits
+    |> List.max
 ```
 
 5. Реализация на Python:
 
 ```
+strToInt = [int(digit) for digit in number]
 
+def find_product(strToInt):
+    product = 1
+    for number in strToInt:
+        product *= number
+    return product
+
+max_prod = 0
+
+for i in range(len(strToInt) - 13 + 1):
+    curent_sequence = strToInt[i:i+13]
+    current_prod = find_product(curent_sequence)
+    if current_prod > max_prod:
+        max_prod = current_prod
+
+print("Максимальное произведение: ", max_prod)
 ```
 
 --- 
