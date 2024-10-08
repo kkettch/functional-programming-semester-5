@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        folder: [lab1]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,7 +29,7 @@ jobs:
         run: |
           dotnet tool install -g dotnet-fsharplint
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          dotnet fsharplint lint ./lab1/src
+          dotnet fsharplint lint ./src
       - name: Formatter
         run: |
           dotnet tool install -g fantomas-tool
