@@ -1,19 +1,27 @@
 module AmicableNumbers
 
+(*
+    upd. pattern matching
+*)
 let d n =
     let rec findSum acc i =
-        if i >= n then acc
-        elif n % i = 0 then findSum (acc + i) (i + 1)
-        else findSum acc (i + 1)
+        match i with
+        | i when i >= n -> acc
+        | i when n % i = 0 -> findSum (acc + i) (i + 1)
+        | _ -> findSum acc (i + 1)
     findSum 0 1
 
+(*
+    upd. pattern matching
+*)
 let rec getAmicableNumbersRecursion n limit acc =
-    if n >= limit then acc
-    else
+    match n with
+    | n when n >= limit -> acc
+    | _ ->
         let b = d n
-        if b <> n && d b = n && b < limit then
-            getAmicableNumbersRecursion (n + 1) limit (n :: acc)
-        else getAmicableNumbersRecursion (n + 1) limit acc
+        match b with
+        | b when b <> n && d b = n && b < limit -> getAmicableNumbersRecursion (n + 1) limit (n :: acc)
+        | _ -> getAmicableNumbersRecursion (n + 1) limit acc
 
 let amicableSumRecursion = List.sum (getAmicableNumbersRecursion 1 10000 [])
 
@@ -28,15 +36,22 @@ let getAmicableNumbersMap =
 
 let amicableSumMap = List.sum getAmicableNumbersMap
 
+(*
+    upd. infinite seq.
+*)
+let infiniteSeqAmicableNumbers () =
+    Seq.initInfinite (fun n -> n + 1) 
+    |> Seq.filter (fun n -> 
+        let b = d n
+        b <> n && d b = n 
+    )
+
 let getAmicableNumbersLazy limit =
-    seq {
-        for n in 1 .. limit-1 do
-            let b = d n
-            if b <> n && d b = n && b < limit then
-                yield n
-    }
+    infiniteSeqAmicableNumbers ()
+    |> Seq.takeWhile (fun n -> n < limit) 
 
 let amicableSumLazy = Seq.sum (getAmicableNumbersLazy 10000)
+
 
 let sumDivisors n =
     [1 .. n/2]
