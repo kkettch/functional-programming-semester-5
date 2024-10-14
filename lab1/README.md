@@ -3,15 +3,14 @@
 `ФИО: Чмурова Мария Владиславовна` <br />
 `Isu_id: 369027` <br />
 `Группа: P3332` <br />
-`Язык программирования: F#`
 
 ### Список задач 
 ---
-**Задача №8** <br />
+**Задача №8** 
 Найти максимально произведение последовательности из 13-подряд идущих цифр в числе из 1000 цифр. 
 
 ---
-**Задача №21** <br />
+**Задача №21**
 `d(n)` - сумма всех делителей числа n 
 Необходимо найти сумму всех чисел, меньших 10000, для которых выполняются условия: 
 - `d(a) = b` и `d(b) = a`
@@ -35,18 +34,16 @@ let stringToIntList str = 
     |> Seq.toList
 ```
 
-2. Хвостовая рекурсия для нахождения максимального произведения
+2. Хвостовая рекурсия для нахождения максимального произведения (upd. pattern matching)
 
 ```F#
-let rec findMaxTailRecursion nbrList maxProd i = 
-    if i > (List.length nbrList - 13) then maxProd
-    else
-        let curNbr = 
-            List.skip i nbrList
-            |> List.take 13
-        let prod: BigInteger = List.fold (*) 1I curNbr
-        let newMaxProd = 
-            if prod > maxProd then prod else maxProd
+let rec findMaxTailRecursion nbrList maxProd i =
+    match i, List.length nbrList with
+    | _, len when i > len - 13 -> maxProd
+    | _ ->
+        let curNbr = List.take 13 (List.skip i nbrList)
+        let prod = List.fold (*) 1I curNbr
+        let newMaxProd = if prod > maxProd then prod else maxProd
         findMaxTailRecursion nbrList newMaxProd (i + 1)
 ```
 
@@ -111,27 +108,29 @@ for i in range(len(strToInt) - 13 + 1):
 
 #### Решение
 
-1. Хвостовая рекурсия для реализации функции `d(n)` - нахождения суммы всех делителей числа `n`
+1. Хвостовая рекурсия для реализации функции `d(n)` - нахождения суммы всех делителей числа `n` (upd. pattern matching)
 
 ```F#
 let d n =
     let rec findSum acc i =
-        if i >= n then acc
-        elif n % i = 0 then findSum (acc + i) (i + 1)
-        else findSum acc (i + 1)
+        match i with
+        | i when i >= n -> acc
+        | i when n % i = 0 -> findSum (acc + i) (i + 1)
+        | _ -> findSum acc (i + 1)
     findSum 0 1
 ```
 
-2. Рекурсия для нахождения дружественных чисел < 10000
+2. Рекурсия для нахождения дружественных чисел < 10000 (upd. pattern matching)
 
 ```F#
 let rec getAmicableNumbersRecursion n limit acc =
-    if n >= limit then acc
-    else
+    match n with
+    | n when n >= limit -> acc
+    | _ ->
         let b = d n
-        if b <> n && d b = n && b < limit then
-            getAmicableNumbersRecursion (n + 1) limit (n :: acc)
-        else getAmicableNumbersRecursion (n + 1) limit acc
+        match b with
+        | b when b <> n && d b = n && b < limit -> getAmicableNumbersRecursion (n + 1) limit (n :: acc)
+        | _ -> getAmicableNumbersRecursion (n + 1) limit acc
 ```
 
 3. Нахождение дружественных чисел с использованием map:
@@ -151,16 +150,19 @@ let getAmicableNumbersMap = 
 let amicableSumMap = List.sum getAmicableNumbersMap
 ```
 
-4. Ленивые коллекции и использование специального синтаксиса для циклов
+4. Ленивые коллекции и использование специального синтаксиса для циклов (upd. infinite seq)
 
 ```F#
+let infiniteSeqAmicableNumbers () =
+    Seq.initInfinite (fun n -> n + 1) 
+    |> Seq.filter (fun n -> 
+        let b = d n
+        b <> n && d b = n 
+    )
+
 let getAmicableNumbersLazy limit =
-    seq {
-        for n in 1 .. limit-1 do
-            let b = d n
-            if b <> n && d b = n && b < limit then
-                yield n
-    }
+    infiniteSeqAmicableNumbers ()
+    |> Seq.takeWhile (fun n -> n < limit) 
 
 let amicableSumLazy = Seq.sum (getAmicableNumbersLazy 10000)
 ```
@@ -206,5 +208,5 @@ amicable_numbers = get_amicable_numbers(10000)
 ---
 ### Выводы
 
-В ходе данной лабораторной работы я познакомилась с основами синтаксиса языка F#, написанием функций и некоторыми особенностями функционального языка, такими как неизменные переменные и ленивые вычисления. Данная работа была больше интересной, чем сложной, несмотря на начальные непонятки при освоении синтаксиса. <br />
-Наибольшую сложность вызвало освоение, запоминание и использование всех используемых функций классов List и Seq для работы со списками и последовательностями. Интересно было поработать с pattern matching (сопоставление с образцом), он напоминает логику switch/case в C. 
+В ходе данной лабораторной работы я познакомилась с основами синтаксиса языка F#, написанием функций и некоторыми особенностями функционального языка, такими как неизменные переменные и ленивые вычисления. Данная работа была больше интересной, чем сложной, несмотря на начальные непонятки при освоении синтаксиса.  
+Наибольшую сложность вызвало освоение, запоминание и использование всех используемых функций классов List и Seq для работы со списками и последовательностями. Интересно было поработать с pattern matching (сопоставление с образцом), он напоминает логику switch/case в C.
