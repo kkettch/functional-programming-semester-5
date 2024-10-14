@@ -7,15 +7,16 @@ let stringToIntList str =
     |> Seq.map (fun digit -> bigint (int (string digit)))
     |> Seq.toList
 
-let rec findMaxTailRecursion nbrList maxProd i = 
-    if i > (List.length nbrList - 13) then maxProd
-    else
-        let curNbr = 
-            List.skip i nbrList
-            |> List.take 13
-        let prod: BigInteger = List.fold (*) 1I curNbr
-        let newMaxProd = 
-            if prod > maxProd then prod else maxProd
+(*
+     upd. pattern matching 
+ *)
+let rec findMaxTailRecursion nbrList maxProd i =
+    match i, List.length nbrList with
+    | _, len when i > len - 13 -> maxProd
+    | _ ->
+        let curNbr = List.take 13 (List.skip i nbrList)
+        let prod = List.fold (*) 1I curNbr
+        let newMaxProd = if prod > maxProd then prod else maxProd
         findMaxTailRecursion nbrList newMaxProd (i + 1)
 
 let rec maxProdTailRecursion str =
