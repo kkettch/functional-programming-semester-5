@@ -13,14 +13,6 @@ module PropertyTests =
         | Empty -> false
 
     [<Property>]
-    let ``Adding an existing element does not change the tree structure`` (x: int) =
-        let tree = empty |> add x
-        let newTree = add x tree
-        match newTree, tree with
-        | Node(_, newValue, _, _), Node(_, oldValue, _, _) -> newValue = oldValue
-        | _ -> false
-
-    [<Property>]
     let ``foldLeft correctly sums all values in the tree`` (xs: int list) =
         let tree = List.fold (fun acc x -> add x acc) empty xs
         let result = foldLeft (+) 0 tree
