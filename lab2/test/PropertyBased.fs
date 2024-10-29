@@ -13,10 +13,10 @@ module PropertyTests =
         | Empty -> false
 
     [<Property>]
-    let ``foldLeft correctly sums all values in the tree`` (xs: int list) =
-        let tree = List.fold (fun acc x -> add x acc) empty xs
+    let ``foldLeft correctly sums all values in the tree`` (x: int) (y: int) (z: int) =
+        let tree = empty |> add x |> add y |> add z
         let result = foldLeft (+) 0 tree
-        let expected = List.sum xs
+        let expected = x + y + z
         result = expected
     
     [<Property>]
