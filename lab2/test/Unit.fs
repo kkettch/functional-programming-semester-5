@@ -48,6 +48,16 @@ module Tests =
         let tree = empty |> add 10 |> add 20 |> add 6
         let result = foldLeft (+) 0 tree
         Assert.Equal(36, result)
-    
+        
+    [<Fact>]
+    let ``Combine is associative`` () =
+        let treeA = empty |> add 10
+        let treeB = empty |> add 20
+        let treeC = empty |> add 30
+
+        let combined1 = combine (combine treeA treeB) treeC
+        let combined2 = combine treeA (combine treeB treeC)
+
+        Assert.Equal(combined1, combined2)
 
 
