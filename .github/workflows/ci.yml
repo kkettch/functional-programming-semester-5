@@ -1,4 +1,3 @@
-
 on:
   push:
     branches:
@@ -11,34 +10,42 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: [lab1]
+        folder: [lab1, lab2]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4.0.1
         with:
           dotnet-version: '8.0.x'
+      
       - name: Restore dependencies
-        run: dotnet restore lab1/src/src.fsproj
+        run: dotnet restore ${{ matrix.folder }}/src/src.fsproj
+      
       - name: Build project
-        run: dotnet build ./lab1/src
+        run: dotnet build ${{ matrix.folder }}/src
+
       - name: Set DOTNET_ROLL_FORWARD
         run: echo "DOTNET_ROLL_FORWARD=latestMajor" >> $GITHUB_ENV
+      
       - name: Lint
         run: |
           dotnet tool install -g dotnet-fsharplint
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          dotnet fsharplint lint ./src
+          dotnet fsharplint lint ./${{ matrix.folder }}/src/*.fs
+
       - name: Formatter
         run: |
           dotnet tool install -g fantomas-tool
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          fantomas ./lab1/src/*.fs 
+          fantomas ./${{ matrix.folder }}/src/*.fs 
+
       - name: Run project
-        run: dotnet run --project ./lab1/src
+        run: dotnet run --project ./${{ matrix.folder }}/src
+
       - name: Tests
         run: |
-            dotnet restore lab1/test/test.fsproj
-            dotnet build ./lab1/test
-            dotnet test ./lab1/test --logger "console;verbosity=detailed"
+          dotnet restore ${{ matrix.folder }}/test/test.fsproj
+          dotnet build ./${{ matrix.folder }}/test
+          dotnet test ./${{ matrix.folder }}/test --logger "console;verbosity=detailed"
