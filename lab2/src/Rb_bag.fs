@@ -53,7 +53,7 @@ let rec delete x =
                     | Node(_, _, l, _) -> minValueNode l
                     | Empty -> failwith "empty tree error"
                 let minValue = minValueNode right
-                Node(color, minValue, left, delete minValue right)
+                balance (color, minValue, left, delete minValue right)
 
 let rec filter predicate = 
     function
