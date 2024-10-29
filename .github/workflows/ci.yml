@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: [lab2]
+        folder: [lab1, lab2]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,9 +21,9 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - name: Restore dependencies
-        run: dotnet restore lab2/src/src.fsproj
+        run: dotnet restore ${{ matrix.folder }}/src/src.fsproj
       - name: Build project
-        run: dotnet build ./lab2/src
+        run: dotnet build ./${{ matrix.folder }}/src
       - name: Set DOTNET_ROLL_FORWARD
         run: echo "DOTNET_ROLL_FORWARD=latestMajor" >> $GITHUB_ENV
       - name: Lint
@@ -35,11 +35,11 @@ jobs:
         run: |
           dotnet tool install -g fantomas-tool
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          fantomas ./lab2/src/*.fs 
+          fantomas ./${{ matrix.folder }}/src/*.fs 
       - name: Run project
-        run: dotnet run --project ./lab2/src
+        run: dotnet run --project ./${{ matrix.folder }}/src
       - name: Tests
         run: |
-            dotnet restore lab2/test/test.fsproj
-            dotnet build ./lab2/test
-            dotnet test ./lab2/test --logger "console;verbosity=detailed"
+            dotnet restore ${{ matrix.folder }}/test/test.fsproj
+            dotnet build ./${{ matrix.folder }}/test
+            dotnet test ./${{ matrix.folder }}/test --logger "console;verbosity=detailed"
