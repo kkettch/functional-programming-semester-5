@@ -27,3 +27,12 @@ module PropertyTests =
         let leftAssociative = 
             combine (combine tree1 tree2) tree3 = combine tree1 (combine tree2 tree3)
         leftAssociative
+
+    [<Property>]
+    let ``Empty tree is neutral for combine`` (x: int) =
+        let tree = add x empty
+
+        let leftNeutral = combine empty tree
+        let rightNeutral = combine tree empty
+
+        leftNeutral = tree && rightNeutral = tree
