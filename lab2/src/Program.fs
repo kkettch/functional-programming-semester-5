@@ -20,7 +20,6 @@ let main argv =
     let tree = insert 8 tree
     let tree = insert 20 tree
 
-    // Выводим дерево после вставок
     printTree tree 0
 
     0
