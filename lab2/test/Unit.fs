@@ -16,13 +16,12 @@ module RedBlackTreeTests =
 
     let isGreaterThanFive x = x > 5
 
-
     [<Fact>]
     let ``Filter should retain nodes greater than 5`` () =
         let filteredTree = filter isGreaterThanFive testTree
-        Assert.True(contains filteredTree 10) 
-        Assert.False(contains filteredTree 5) 
-        Assert.True(contains filteredTree 15)
+        Assert.True(isMember filteredTree 10) 
+        Assert.False(isMember filteredTree 5) 
+        Assert.True(isMember filteredTree 15)
 
     [<Fact>]
     let ``Filter should return empty tree for all less than 5`` () =
@@ -32,9 +31,9 @@ module RedBlackTreeTests =
     [<Fact>]
     let ``Filter should return same tree for all greater than 0`` () =
         let filteredTree = filter (fun _ -> true) testTree
-        Assert.True(contains filteredTree 10) 
-        Assert.True(contains filteredTree 5)
-        Assert.True(contains filteredTree 15) 
+        Assert.True(isMember filteredTree 10) 
+        Assert.True(isMember filteredTree 5)
+        Assert.True(isMember filteredTree 15) 
 
     [<Fact>]
     let ``Filter should return empty tree for all greater than 20`` () =
