@@ -142,8 +142,8 @@ let combineTrees left right =
     match left, right with
     | Empty, _ -> right
     | _, Empty -> left
-    | Node {value = v; color = c; left = _; right = _} as node, _ ->
-        Node {value = v; color = c; left = left; right = right}
+    | Node {value = value; color = color; left = _; right = _} as node, _ ->
+        Node {value = value; color = color; left = left; right = right}
         
 let rec filter pred tree =
     match tree with
