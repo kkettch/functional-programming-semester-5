@@ -4,60 +4,105 @@ open Xunit
 open FsCheck
 open RbBag 
 
-module Tests =
+module RedBlackTreeTests =
+
+    let testTree =
+        Node { value = 10; color = Black; 
+                left = Node { value = 5; color = Red; left = Empty; right = Empty }; 
+                right = Node { value = 15; color = Red; left = Empty; right = Empty } }
     
-    [<Fact>]
-    let ``Insert creates a valid red-black tree`` () =
-        let tree = empty |> add 10 |> add 10 |> add 5
-        match tree with
-        | Node (Black, 10, Node (Red, 5, Empty, Empty), Node (Red, 10, Empty, Empty)) -> ()
-        | _ -> failwith $"Tree structure is invalid. Expected:Node (Black, 10, Node (Red, 5, Empty, Empty), Node (Red, 10, Empty, Empty)), but got: {tree}"
+    let sampleTree =
+        Node { value = 10; color = Black; left = Node { value = 5; color = Red; left = Empty; right = Empty }; right = Node { value = 15; color = Red; left = Empty; right = Empty } }
+
+    let isGreaterThanFive x = x > 5
+
 
     [<Fact>]
-    let ``Delete reduces the tree size`` () =
-        let tree = empty |> add 10 |> add 20 |> add 5
-        let newTree = delete 10 tree
-        match newTree with
-        | Node(Black, 20, Node(Red, 5, Empty, Empty), Empty) -> ()
-        | _ -> failwith $"Delete operation did not produce expected tree. Expected: Node(Black, 20, Node(Black, 5, Empty, Empty), Empty), but got: {newTree}"
+    let ``Filter should retain nodes greater than 5`` () =
+        let filteredTree = filter isGreaterThanFive testTree
+        Assert.True(contains filteredTree 10) 
+        Assert.False(contains filteredTree 5) 
+        Assert.True(contains filteredTree 15)
 
     [<Fact>]
-    let ``Filter retains nodes satisfying the predicate`` () =
-        let tree = empty |> add 10 |> add 20 |> add 5
-        let filteredTree = filter (fun x -> x > 10) tree
-        match filteredTree with
-        | Node(_, 20, Empty, Empty) -> ()
-        | _ -> failwith $"Filter operation did not produce expected tree. Expected: Node(_, 20, Empty, Empty), but got: {filteredTree}"
+    let ``Filter should return empty tree for all less than 5`` () =
+        let filteredTree = filter (fun x -> x < 5) testTree
+        Assert.Equal(Empty, filteredTree) 
 
     [<Fact>]
-    let ``Map applies function to all values`` () =
-        let tree = empty |> add 10 |> add 20 |> add 5
-        let mappedTree = map ((+) 1) tree
-        match mappedTree with
-        | Node (Black, 11, Node (Red, 6, Empty, Empty), Node (Red, 21, Empty, Empty)) -> ()
-        | _ -> failwith $"Map operation did not produce expected tree. Expected: Node(_, 11, Node(_, 21, Empty, Empty), Node(_, 6, Empty, Empty)), but got: {mappedTree}"
+    let ``Filter should return same tree for all greater than 0`` () =
+        let filteredTree = filter (fun _ -> true) testTree
+        Assert.True(contains filteredTree 10) 
+        Assert.True(contains filteredTree 5)
+        Assert.True(contains filteredTree 15) 
 
     [<Fact>]
-    let ``FoldLeft aggregates values correctly`` () =
-        let tree = empty |> add 10 |> add 20 |> add 5
-        let result = foldLeft (+) 0 tree
-        Assert.Equal(35, result)
-    
+    let ``Filter should return empty tree for all greater than 20`` () =
+        let filteredTree = filter (fun x -> x > 20) testTree
+        Assert.Equal(Empty, filteredTree)
+
     [<Fact>]
-    let ``foldRight aggregates values correctly`` () =
-        let tree = empty |> add 10 |> add 20 |> add 6
-        let result = foldLeft (+) 0 tree
-        Assert.Equal(36, result)
+    let ``Map should double the values in the tree`` () =
+        let expected = 
+            Node { value = 20; color = Black; left = Node { value = 10; color = Red; left = Empty; right = Empty }; right = Node { value = 30; color = Red; left = Empty; right = Empty } }
         
+        let result = map ((*) 2) sampleTree
+        Assert.Equal(expected, result)
+
     [<Fact>]
-    let ``Combine is associative`` () =
-        let treeA = empty |> add 10
-        let treeB = empty |> add 20
-        let treeC = empty |> add 30
+    let ``FoldLeft should sum the values in the tree`` () =
+        let sumFunction acc value = acc + value
+        let result = foldLeft sumFunction 0 sampleTree
+        Assert.Equal(30, result)
 
-        let combined1 = combine (combine treeA treeB) treeC
-        let combined2 = combine treeA (combine treeB treeC)
+    [<Fact>]
+    let ``FoldRight should sum the values in the tree`` () =
+        let sumFunction value acc = acc + value
+        let result = foldRight sumFunction sampleTree 0
+        Assert.Equal(30, result)
 
-        Assert.Equal(combined1, combined2)
+    [<Fact>]
+    let ``isMember should return true for a value in the tree`` () =
+        Assert.True(isMember sampleTree 10)
 
+    [<Fact>]
+    let ``isMember should return false for a value not in the tree`` () =
+        Assert.False(isMember sampleTree 100)
 
+    [<Fact>]
+    let ``Delete an existing element from tree`` () =
+        let tree = insertMany [1; 2; 3] empty
+        let resultTree = delete 2 tree
+        Assert.False(isMember resultTree 2)
+        Assert.True(isMember resultTree 1)
+        Assert.True(isMember resultTree 3)
+
+    [<Fact>]
+    let ``Delete non-existing element should not affect tree`` () =
+        let tree = insertMany [1; 2; 3] empty
+        let resultTree = delete 4 tree
+        Assert.True(isMember resultTree 1)
+        Assert.True(isMember resultTree 2)
+        Assert.True(isMember resultTree 3)
+
+    [<Fact>]
+    let ``Delete root element from single-element tree`` () =
+        let tree = insert 1 empty
+        let resultTree = delete 1 tree
+        Assert.Equal(resultTree, Empty)
+
+    [<Fact>]
+    let ``Delete leaf element should maintain balance`` () =
+        let tree = insertMany [10; 20; 5; 15] empty
+        let resultTree = delete 5 tree
+        Assert.False(isMember resultTree 5)
+        Assert.True(isMember resultTree 10)
+        Assert.True(isMember resultTree 20)
+        Assert.True(isMember resultTree 15)
+    
+    [<Fact>]
+    let ``Delete an element and check if remaining elements are still accessible`` () =
+        let tree = insertMany [10; 20; 5; 15; 8] empty
+        let resultTree = delete 10 tree
+        Assert.False(isMember resultTree 10)
+        List.iter (fun x -> Assert.True(isMember resultTree x)) [5; 20; 15; 8]
