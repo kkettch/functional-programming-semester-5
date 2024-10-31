@@ -22,15 +22,40 @@ type RedBlackTree<'T> =
 
 1. Балансировка дерева для поддержания сбалансированности дерева: 
 ```F#
-let balance = 
-    function
-    | Black, z, Node(Red, y, Node(Red, x, a, b), c), d //LL imbalance
-    | Black, z, Node(Red, x, a, Node(Red, y, b, c)), d //LR imbalance
-    | Black, x, a, Node(Red, z, Node(Red, y, b, c), d) //RL imbalance
-    | Black, x, a, Node(Red, y, b, Node(Red, z, c, d)) -> //RR imbalance
-        Node(Red, y, blackNode x a b, blackNode z c d)
-    | color, value, left, right -> 
-        Node(color, value, left, right)
+let rec balance color x a b =
+        match (color, x, a, b) with
+        | (Black, z, 
+            Node {
+                value = y; 
+                color = Red; 
+                left = Node 
+	                { 
+	                    value = x; 
+	                    color = Red; 
+	                    left = a; 
+	                    right = b 
+		            }; 
+                right = c
+			}, d)     // LL imbalance
+        | (Black, z, 
+	        Node 
+	        {
+		        value = x; 
+		        color = Red; 
+		        left = a; 
+		        right = Node { 
+			        value = y; 
+			        color = Red; 
+			        left = b; 
+			        right = c }; 
+			}, d)    // LR imbalance
+        | (Black, x, a, Node { value = z; color = Red; left = Node { value = y; color = Red; left = b; right = c }; right = d; })    // RL imbalance
+        | (Black, x, a, Node { value = y; color = Red; left = b; right = Node { value = z; color = Red; left = c; right = d }; }) ->    // RR imbalance
+            Node {  value = y; color = Red; 
+                    left = Node {value = x; color = Black; left = a; right = b}; 
+                    right = Node {value = z; color = Black; left = c; right = d}
+                    }
+        | _ -> Node { value = x; color = color; left = a; right = b }
 ```
 
 2. Вставка элемента в дерева. Элемент корня всегда черный (функц. add)
