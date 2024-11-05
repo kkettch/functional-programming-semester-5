@@ -28,9 +28,13 @@ let ``Tree combination is associative`` (xs: int list) (ys: int list) (zs: int l
     let tree1 = insertMany xs empty
     let tree2 = insertMany ys empty
     let tree3 = insertMany zs empty
-    let combined1 = insertMany ys (insertMany xs tree3)
-    let combined2 = insertMany xs (insertMany ys tree3)
-    allElementsInOtherTree combined1 combined2 && allElementsInOtherTree combined2 combined1
+    let combined1 = insertMany zs (insertMany xs tree2) // ((xs + ys) + zs)
+    let combined2 = insertMany xs (insertMany ys tree3) // (xs + (ys + zs))
+    let combined3 = insertMany ys (insertMany zs tree1) // ((zs + xs) + ys)
+
+    allElementsInOtherTree combined1 combined2 && 
+    allElementsInOtherTree combined2 combined3 &&
+    allElementsInOtherTree combined1 combined3
 
 [<Property>]
 let ``Map preserves elements in tree`` (xs: int list) =
