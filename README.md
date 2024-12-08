@@ -1,4 +1,4 @@
-# FunctionalProgramming_semester5
+# functional-programming-semester-5
 Выполнение задач по предмету "Функциональное программирование" на 5-ом семестре Университета ИТМО
 
 ## Навигация по репозиторию: 
