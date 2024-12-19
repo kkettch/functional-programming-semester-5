@@ -13,7 +13,7 @@ let main argv =
             printTree l (level + 1)
 
     let tree = empty
-    let tree = insertMany [10; 15; 3; 8; 20] tree
+    let tree = insertMany [10; 15; 15; 3; 8; 20] tree
 
     printTree tree 0
 
