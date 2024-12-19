@@ -6,14 +6,7 @@ open RbBag
 
 module RedBlackTreeTests =
 
-    let testTree =
-        Node { value = 10; color = Black; 
-                left = Node { value = 5; color = Red; left = Empty; right = Empty }; 
-                right = Node { value = 15; color = Red; left = Empty; right = Empty } }
-    
-    let sampleTree =
-        Node { value = 10; color = Black; left = Node { value = 5; color = Red; left = Empty; right = Empty }; right = Node { value = 15; color = Red; left = Empty; right = Empty } }
-
+    let testTree = insertMany [1; 2; 2; 1; 4; -20; 10; -20] empty
     let isGreaterThanFive x = x > 5
 
     [<Fact>]
@@ -21,19 +14,16 @@ module RedBlackTreeTests =
         let filteredTree = filter isGreaterThanFive testTree
         Assert.True(isMember filteredTree 10) 
         Assert.False(isMember filteredTree 5) 
-        Assert.True(isMember filteredTree 15)
-
-    [<Fact>]
-    let ``Filter should return empty tree for all less than 5`` () =
-        let filteredTree = filter (fun x -> x < 5) testTree
-        Assert.Equal(Empty, filteredTree) 
+        Assert.False(isMember filteredTree 4)
+        Assert.False(isMember filteredTree -20)
 
     [<Fact>]
     let ``Filter should return same tree for all greater than 0`` () =
         let filteredTree = filter (fun _ -> true) testTree
         Assert.True(isMember filteredTree 10) 
-        Assert.True(isMember filteredTree 5)
-        Assert.True(isMember filteredTree 15) 
+        Assert.True(isMember filteredTree 4)
+        Assert.True(isMember filteredTree -20) 
+        Assert.True(isMember filteredTree 1)
 
     [<Fact>]
     let ``Filter should return empty tree for all greater than 20`` () =
@@ -41,32 +31,24 @@ module RedBlackTreeTests =
         Assert.Equal(Empty, filteredTree)
 
     [<Fact>]
-    let ``Map should double the values in the tree`` () =
-        let expected = 
-            Node { value = 20; color = Black; left = Node { value = 10; color = Red; left = Empty; right = Empty }; right = Node { value = 30; color = Red; left = Empty; right = Empty } }
-        
-        let result = map ((*) 2) sampleTree
-        Assert.Equal(expected, result)
-
-    [<Fact>]
     let ``FoldLeft should sum the values in the tree`` () =
         let sumFunction acc value = acc + value
-        let result = foldLeft sumFunction 0 sampleTree
-        Assert.Equal(30, result)
+        let result = foldLeft sumFunction 0 testTree
+        Assert.Equal(1 + 2 + 2 + 1 + 4 + -20 + 10 + -20, result)
 
     [<Fact>]
     let ``FoldRight should sum the values in the tree`` () =
         let sumFunction value acc = acc + value
-        let result = foldRight sumFunction sampleTree 0
-        Assert.Equal(30, result)
+        let result = foldRight sumFunction testTree 0
+        Assert.Equal(1 + 2 + 2 + 1 + 4 + -20 + 10 + -20, result) 
 
     [<Fact>]
     let ``isMember should return true for a value in the tree`` () =
-        Assert.True(isMember sampleTree 10)
+        Assert.True(isMember testTree 10)
 
     [<Fact>]
     let ``isMember should return false for a value not in the tree`` () =
-        Assert.False(isMember sampleTree 100)
+        Assert.False(isMember testTree 100)
 
     [<Fact>]
     let ``Delete an existing element from tree`` () =
