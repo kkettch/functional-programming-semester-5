@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="OutputHandler.fs" />
+    <Compile Include="LinearInterpolation.fs" />
+    <Compile Include="ProcessInput.fs" />
+    <Compile Include="InputHandler.fs" />
+    <Compile Include="Program.fs" />
+    
+  </ItemGroup>
+
+</Project>
