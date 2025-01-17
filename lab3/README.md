@@ -35,12 +35,12 @@ let rec linearInterpolation (x0, y0) (x1, y1) (step : float) =
 ```F#
 let newtonInterpolation points step =
 
-    let rec xFunc (points:seq<float*float>) currentX =
+    let rec muliplyingX points currentX =
         match Seq.length points with
             | 1 -> (currentX - fst (Seq.last points))
-            | _ -> (currentX - fst (Seq.last points)) * (xFunc (Seq.take ((Seq.length points) - 1) points) currentX)
+            | _ -> (currentX - fst (Seq.last points)) * (muliplyingX (Seq.take ((Seq.length points) - 1) points) currentX)
 
-    let rec dividedDifference points (currentX:float) =
+    let rec dividedDifference points currentX =
         match Seq.length points with
         | 1 -> (currentX - fst (Seq.head points))
         | _ -> (currentX - fst (Seq.head points)) * (dividedDifference (Seq.tail points) currentX)
@@ -51,7 +51,7 @@ let newtonInterpolation points step =
         match amountOfPoints with
         | 1 -> (snd (Seq.head points)) / (dividedDifference (Seq.tail points) (fst (Seq.head points)))
         | _ -> (snd (Seq.head points)) / (dividedDifference (Seq.tail points) (fst (Seq.head points))) + (coefficients (swap points) (amountOfPoints-1))
-
+    
     let rec newtonInterpolationFunc points countedX =
         let deleteLast someSeq = 
             Seq.take ((Seq.length someSeq) - 1) someSeq
@@ -59,7 +59,7 @@ let newtonInterpolation points step =
         | 1 -> snd (Seq.head points)
         | _ -> 
             let countedСoefficient = coefficients points (Seq.length points)
-            let currentxFunc = xFunc (deleteLast points) countedX
+            let currentxFunc = muliplyingX (deleteLast points) countedX
             (countedСoefficient)*(currentxFunc) + (newtonInterpolationFunc (deleteLast points) countedX)
 
     let rec newtonInterpolationRecursive points xMin xMax step =
