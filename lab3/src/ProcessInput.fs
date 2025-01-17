@@ -21,7 +21,7 @@ let processInput (points: seq<float * float>) (step: float) =
 
                     let linearInterpolated = 
                         if Seq.length currentPoints >= 2 then
-                            let lastTwoPoints = currentPoints |> Seq.rev |> Seq.take 2 |> Seq.rev |> Seq.toList
+                            let lastTwoPoints = currentPoints |> Seq.rev |> Seq.take 2 |> Seq.rev 
                             lastTwoPoints
                             |> Seq.pairwise
                             |> Seq.collect (fun (p1, p2) ->
@@ -31,7 +31,7 @@ let processInput (points: seq<float * float>) (step: float) =
 
                     let newtonInterpolated =
                         if Seq.length currentPoints >= 3 then
-                            let lastThreePoints = currentPoints |> Seq.rev |> Seq.take 3 |> Seq.rev |> Seq.toList
+                            let lastThreePoints = currentPoints |> Seq.rev |> Seq.take 3 |> Seq.rev 
                             let newtonInterpolated = newtonInterpolation lastThreePoints step
                             seq { "newton", newtonInterpolated }
                         else Seq.empty
