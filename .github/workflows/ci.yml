@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: [lab1, lab2]
+        folder: [lab1, lab2, lab3]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
