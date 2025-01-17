@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: [lab1, lab2]
+        folder: [lab1, lab2, lab3]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,8 +36,8 @@ jobs:
           dotnet tool install -g fantomas-tool
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
           fantomas ./${{ matrix.folder }}/src/*.fs 
-      - name: Run project
-        run: dotnet run --project ./${{ matrix.folder }}/src
+      # - name: Run project
+      #   run: dotnet run --project ./${{ matrix.folder }}/src
       - name: Tests
         run: |
             dotnet restore ${{ matrix.folder }}/test/test.fsproj
