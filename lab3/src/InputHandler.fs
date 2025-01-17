@@ -3,7 +3,6 @@ module InputHandler
 open System
 open LinearInterpolation
 
-
 (*
     Модуль для обработки ввода с консоли
 *)
@@ -26,5 +25,5 @@ let handleInput (reader: System.IO.TextReader) =
                 if values.Length = 2 then
                     yield float values.[0], float values.[1]
                 else
-                    printfn "error: incorect input. correct input: X Y"
+                    printfn "error: invalid input. correct input: X Y"
     }

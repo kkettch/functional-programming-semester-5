@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <Compile Include="OutputHandler.fs" />
+    <Compile Include="NewtonInterpolation.fs" />
     <Compile Include="LinearInterpolation.fs" />
     <Compile Include="ProcessInput.fs" />
     <Compile Include="InputHandler.fs" />
