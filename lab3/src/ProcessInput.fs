@@ -8,31 +8,43 @@ open NewtonInterpolation
 *)
 
 let processInput (points: seq<float * float>) (step: float) =
-    seq {
+    seq {   
+
         let accumulatedPoints =
             Seq.scan
-                (fun acc point ->
-                    acc @ [ point ])
-                [] 
+                (fun (firstPoint, buffer) point ->
+                    match firstPoint with
+                    | [] -> 
+                        ( [point], [point] )  
+                    | _ -> 
+                        let newBuffer = 
+                            if List.length buffer < 3 then 
+                                buffer @ [point]  
+                            else 
+                                buffer.Tail @ [point]  
+
+                        (firstPoint, newBuffer) 
+                ) 
+                ([], [])  
                 points
-
+            
         yield! accumulatedPoints
-               |> Seq.collect (fun currentPoints ->
-
+               |> Seq.collect (fun currentPoints -> 
                     let linearInterpolated = 
-                        if Seq.length currentPoints >= 2 then
-                            let lastTwoPoints = currentPoints |> Seq.rev |> Seq.take 2 |> Seq.rev 
+                        if List.length (snd currentPoints) >= 2 then
+                            let lastTwoPoints = (snd currentPoints) |> List.rev |> List.take 2 |> List.rev 
+                            let firstNumber = (fst (List.head (fst currentPoints)))
                             lastTwoPoints
                             |> Seq.pairwise
-                            |> Seq.collect (fun (p1, p2) ->
-                                let interpolatedPoints = linearInterpolation p1 p2 step
+                            |> Seq.collect (fun (p1, p2) ->   
+                                let interpolatedPoints = linearInterpolation p1 p2 step firstNumber
                                 seq { "linear", interpolatedPoints })
                         else Seq.empty
 
                     let newtonInterpolated =
-                        if Seq.length currentPoints >= 3 then
-                            let lastThreePoints = currentPoints |> Seq.rev |> Seq.take 3 |> Seq.rev 
-                            let newtonInterpolated = newtonInterpolation lastThreePoints step
+                        if List.length (snd currentPoints) >= 3 then
+                            let firstNumber = (fst (List.head (fst currentPoints)))
+                            let newtonInterpolated = newtonInterpolation (snd currentPoints) step firstNumber
                             seq { "newton", newtonInterpolated }
                         else Seq.empty
 

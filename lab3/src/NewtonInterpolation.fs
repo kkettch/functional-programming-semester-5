@@ -4,7 +4,7 @@ module NewtonInterpolation
     Модуль для расчета интерполяции методом Ньютона
 *)
 
-let newtonInterpolation points step =
+let newtonInterpolation points step minX =
 
     let rec muliplyingX points currentX =
         match Seq.length points with
@@ -33,14 +33,16 @@ let newtonInterpolation points step =
             let currentxFunc = muliplyingX (deleteLast points) countedX
             (countedСoefficient)*(currentxFunc) + (newtonInterpolationFunc (deleteLast points) countedX)
 
-    let rec newtonInterpolationRecursive points xMin xMax step =
-        if xMin > xMax then
+    let rec newtonInterpolationRecursive points xMin xMax step minX =
+        if minX < xMin then
+            newtonInterpolationRecursive points xMin xMax step (minX + step)
+        else if minX > xMax then
             Seq.empty
         else
-            let countedPoint = (xMin, newtonInterpolationFunc points xMin)
-            let nextPoints = newtonInterpolationRecursive points (xMin + step) xMax step
+            let countedPoint = (minX, newtonInterpolationFunc points minX)
+            let nextPoints = newtonInterpolationRecursive points xMin xMax step (minX + step)
             Seq.append (Seq.singleton countedPoint) nextPoints
 
     let xMin = points |> Seq.minBy fst |> fst
     let nextXMax = (points |> Seq.maxBy fst |> fst) + step  
-    newtonInterpolationRecursive points xMin nextXMax step
+    newtonInterpolationRecursive points xMin nextXMax step minX
