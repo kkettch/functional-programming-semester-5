@@ -19,21 +19,24 @@
 
 ### Линейная интерполяция: 
 ```F#
-let rec linearInterpolation (x0, y0) (x1, y1) (step : float) =
-    if x0 > (x1 + step) then
-        Seq.empty 
+let rec linearInterpolation (x0, y0) (x1, y1) (step: float) (minX: float) =
+    if minX < x0 then
+        linearInterpolation (x0, y0) (x1, y1) step (minX + step)
     else
-        let x = x0 + step
-        let y = (y0 * (x1 - x) + y1 * (x - x0)) / (x1 - x0)
-        seq {
-            yield (x0, y0)
-            yield! linearInterpolation (x0 + step, y) (x1, y1) step
-        }
+        if minX > x1 then
+            Seq.empty
+        else
+            let x = minX
+            let y = (y0 * (x1 - x) + y1 * (x - x0)) / (x1 - x0)
+            seq {
+                yield (x, y)
+                yield! linearInterpolation (x, y) (x1, y1) step (minX + step)
+            }
 ```
 
 ### Метод Ньютона: 
 ```F#
-let newtonInterpolation points step =
+let newtonInterpolation points step minX =
 
     let rec muliplyingX points currentX =
         match Seq.length points with
@@ -62,19 +65,22 @@ let newtonInterpolation points step =
             let currentxFunc = muliplyingX (deleteLast points) countedX
             (countedСoefficient)*(currentxFunc) + (newtonInterpolationFunc (deleteLast points) countedX)
 
-    let rec newtonInterpolationRecursive points xMin xMax step =
-        if xMin > xMax then
+    let rec newtonInterpolationRecursive points xMin xMax step minX =
+        if minX < xMin then
+            newtonInterpolationRecursive points xMin xMax step (minX + step)
+        else if minX > xMax then
             Seq.empty
         else
-            let countedPoint = (xMin, newtonInterpolationFunc points xMin)
-            let nextPoints = newtonInterpolationRecursive points (xMin + step) xMax step
+            let countedPoint = (minX, newtonInterpolationFunc points minX)
+            let nextPoints = newtonInterpolationRecursive points xMin xMax step (minX + step)
             Seq.append (Seq.singleton countedPoint) nextPoints
 
     let xMin = points |> Seq.minBy fst |> fst
     let nextXMax = (points |> Seq.maxBy fst |> fst) + step  
-    newtonInterpolationRecursive points xMin nextXMax step
+    newtonInterpolationRecursive points xMin nextXMax step minX
 ```
 
 ### Пример работы программы: 
 
-<img width="599" alt="Снимок экрана 2025-01-17 в 16 52 00" src="https://github.com/user-attachments/assets/0e901b71-0ba1-46c1-b312-29a2d048c76d" />
+<img width="454" alt="Снимок экрана 2025-01-20 в 19 31 33" src="https://github.com/user-attachments/assets/48a96673-63da-4595-95fa-42de105bc6c6" />
+
