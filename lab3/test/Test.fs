@@ -12,22 +12,22 @@ let isEqual tolerance part1 part2 =
 
 [<Fact>]
 let ``Test Linear Interpolation with two points`` () =
-    let actual = linearInterpolation (0.0, 0.0) (1.571, 1.0) 1.0
-    let expected = seq { (0.0, 0.0); (1.0, 0.6365372374); (2.0, 1.273074475) }
+    let actual = linearInterpolation (0.0, 0.0) (1.571, 1.0) 1.0 0.0
+    let expected = seq { (0.0, 0.0); (1.0, 0.6365372374) }
     
     Assert.True(isEqual 0.01 expected actual)
 
 [<Fact>]
-let ``Test Linear Interpolation with negative step`` () =
-    let actual = linearInterpolation (0.0, 0.0) (1.571, 1.0) (-1.0)
-    let expected = seq { (0.0, 0.0); (-1.0, -0.6365372374); (-2.0, -1.273074475) }
+let ``Test Linear Interpolation with negative points`` () =
+    let actual = linearInterpolation (-1.0, -1.0) (1.0, 1.0) 1.0 -1.0
+    let expected = seq { (-1.0, -1.0); (0.0, 0.0); (1.0, 1.0) }
     
     Assert.True(isEqual 0.01 expected actual)
 
 [<Fact>]
 let ``Test Newton Interpolation for multiple points`` () =
     let points = [ (0.0, 0.0); (1.0, 2.0); (4.0, 5.0); (6.0, 9.0) ]
-    let actual = newtonInterpolation points 1.0
+    let actual = newtonInterpolation points 1.0 0.0
     let expected = seq {
         (0.0, 0.0);
         (1.0, 2.0);
@@ -41,13 +41,13 @@ let ``Test Newton Interpolation for multiple points`` () =
     Assert.True(isEqual 0.01 expected actual)
 
 [<Fact>]
-let ``Test Newton Interpolation with negative values`` () =
-    let points = [ (-3.0, 9.0); (-2.0, 4.0); (-1.0, 1.0); (0.0, 0.0) ]
-    let actual = newtonInterpolation points 1.0
+let ``Test Newton Interpolation with negative points`` () =
+    let points = [ (-3.0, -9.0); (-2.0, -4.0); (-1.0, -1.0); (0.0, 0.0) ]
+    let actual = newtonInterpolation points 1.0 -3.0
     let expected = seq {
-        (-3.0, 9.0);
-        (-2.0, 4.0);
-        (-1.0, 1.0);
+        (-3.0, -9.0);
+        (-2.0, -4.0);
+        (-1.0, -1.0);
         (0.0, 0.0)
     }
 
@@ -56,7 +56,7 @@ let ``Test Newton Interpolation with negative values`` () =
 [<Fact>]
 let ``Test Newton Interpolation with small step`` () =
     let points = [ (0.0, 0.0); (1.0, 1.0); (2.0, 4.0); (3.0, 9.0); (4.0, 16.0) ]
-    let actual = newtonInterpolation points 0.5
+    let actual = newtonInterpolation points 0.5 0.0
     let expected = seq {
         (0.0, 0.0);
         (0.5, 0.25);
